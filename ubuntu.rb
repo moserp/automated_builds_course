@@ -4,10 +4,14 @@ policy :ubuntu, :roles => :app do
   requires :mtu
   requires :apt_sources
 
+  requires :telnetd
   requires :subversion
-  requires :apache
 
   requires :sample_user
+end
+
+package :telnetd do
+  apt 'telnetd'
 end
 
 package :apache do
@@ -28,6 +32,7 @@ package :apache_config do
 end
 
 package :subversion do
+  requires :apache
   requires :subversion_binaries
   requires :subversion_home
   requires :subversion_sample_project
@@ -66,7 +71,7 @@ end
 deployment do
   delivery :capistrano do
     set :user, 'root'
-    role :app, '109.144.14.236', :primary => true
+    role :app, '109.144.14.244', :primary => true
     default_run_options[:pty] = true
   end
 end
