@@ -6,12 +6,26 @@ policy :ubuntu, :roles => :app do
 
   requires :telnetd
   requires :subversion
+  requires :hudson
 
   requires :sample_user
 end
 
 package :telnetd do
   apt 'telnetd'
+end
+
+package :hudson do
+  requires :wget
+  runner 'wget -q -O - http://pkg.hudson-labs.org/debian/hudson-labs.org.key | apt-key add -'
+  push_text 'deb http://pkg.hudson-labs.org/debian binary/', '/etc/apt/sources.list' do
+    post :install, 'apt-get update'
+  end
+  apt 'hudson'
+end
+
+package :wget do
+  apt 'wget'
 end
 
 package :apache do
@@ -71,7 +85,7 @@ end
 deployment do
   delivery :capistrano do
     set :user, 'root'
-    role :app, '109.144.14.244', :primary => true
+    role :app, '109.144.14.99', :primary => true
     default_run_options[:pty] = true
   end
 end
